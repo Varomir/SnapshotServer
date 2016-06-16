@@ -10,7 +10,7 @@ public class GetBaseline {
 
     @OnOpen
     public void onWebSocketConnect(Session session) {
-        session.setMaxTextMessageBufferSize(2 * 1024 * 1024);
+        session.setMaxTextMessageBufferSize(20 * 1024 * 1024);
     }
 
     @OnMessage
