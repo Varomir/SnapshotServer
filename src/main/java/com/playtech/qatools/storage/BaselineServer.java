@@ -12,9 +12,10 @@ public class BaselineServer {
 
     public static void main(String[] args) {
 
+        Integer port = Integer.parseInt(System.getProperty("port"));
         Server server = new Server();
         ServerConnector connector = new ServerConnector(server);
-        connector.setPort(8081);
+        connector.setPort(port);
         server.addConnector(connector);
 
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);

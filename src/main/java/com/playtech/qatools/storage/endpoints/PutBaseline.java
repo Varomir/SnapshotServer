@@ -22,6 +22,7 @@ public class PutBaseline {
     private StringBuilder url;
     private StringBuilder snapshot;
     private String part[];
+    String path = System.getProperty("snapshot.path");
 
     @OnOpen
     public void onWebSocketConnect(Session session) {
@@ -48,7 +49,7 @@ public class PutBaseline {
         } else {
             snapshot = new StringBuilder("{\"status\":\"not ok\"}");
         }
-        writeMsgToFile("./target/baseline/" + url, deviceDescription.toString(), snapshot.toString());
+        writeMsgToFile(path + url, deviceDescription.toString(), snapshot.toString());
     }
 
     @OnClose
