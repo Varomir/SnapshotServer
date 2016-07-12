@@ -7,7 +7,7 @@
     <name>SnapshotServer</name>
     <groupId>com.playtech.qatools.storage</groupId>
     <artifactId>baseline-server</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <packaging>jar</packaging>
 
     <properties>

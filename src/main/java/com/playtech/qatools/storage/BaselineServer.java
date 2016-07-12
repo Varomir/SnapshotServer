@@ -12,7 +12,7 @@ public class BaselineServer {
 
     public static void main(String[] args) {
 
-        Integer port = Integer.parseInt(System.getProperty("port"));
+        Integer port = Integer.parseInt(System.getProperty("port", "8081"));
         Server server = new Server();
         ServerConnector connector = new ServerConnector(server);
         connector.setPort(port);

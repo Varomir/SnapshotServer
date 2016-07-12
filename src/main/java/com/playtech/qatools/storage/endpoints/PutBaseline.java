@@ -16,13 +16,13 @@ import java.nio.file.Paths;
 public class PutBaseline {
 
     private StringBuilder deviceDescription;
-    private boolean loggedIn;
+    private String loggedIn;
     private StringBuilder filename = new StringBuilder("_loggedIn_");
     private StringBuilder status;
     private StringBuilder url;
     private StringBuilder snapshot;
     private String part[];
-    String path = System.getProperty("snapshot.path");
+    String path = System.getProperty("snapshot.path", "./target/baseline/");
 
     @OnOpen
     public void onWebSocketConnect(Session session) {
@@ -31,25 +31,29 @@ public class PutBaseline {
 
     @OnMessage
     public void onWebSocketText(String message) {
-        System.out.println("Endpoint [PutBaseline], received TEXT message length: " + message.length());
-        deviceDescription = new StringBuilder(JsonPath.parse(message).read("$.device", String.class)).append("_");
-        deviceDescription.append(JsonPath.parse(message).read("$.OS", String.class)).append("_");
-        deviceDescription.append(JsonPath.parse(message).read("$.browser", String.class));
+        try {
+            System.out.println("Endpoint [PutBaseline], received TEXT message length: " + message.length());
+            deviceDescription = new StringBuilder(JsonPath.parse(message).read("$.device", String.class)).append("_");
+            deviceDescription.append(JsonPath.parse(message).read("$.OS", String.class)).append("_");
+            deviceDescription.append(JsonPath.parse(message).read("$.browser", String.class));
 
-        status = new StringBuilder(JsonPath.parse(message).read("$.status", String.class));
-        url = new StringBuilder(JsonPath.parse(message).read("$.url", String.class).replaceAll("^(http|https)://", "").replace("?ui", "").replaceAll(":8080","").replaceAll("[\\?|&](?<name>.*?)=[^&]*&?", ""));
-        url.append("/");
-        //System.out.println(url);
-        loggedIn = JsonPath.parse(message).read("$.loggedIn", Boolean.class);
-        filename.append(loggedIn).append(".json");
-        deviceDescription.append(filename);
-        if (status.toString().equals("ok")) {
-            part = message.split("\"snapshot\":");
-            snapshot = new StringBuilder(part[1].replaceAll(",\"status\":\"ok\"}", ""));
-        } else {
-            snapshot = new StringBuilder("{\"status\":\"not ok\"}");
+            status = new StringBuilder(JsonPath.parse(message).read("$.status", String.class));
+            url = new StringBuilder(JsonPath.parse(message).read("$.url", String.class).replaceAll("^(http|https)://", "").replace("?ui", "").replaceAll(":8080", "").replaceAll("[\\?|&](?<name>.*?)=[^&]*&?", ""));
+            url.append("/");
+            loggedIn = JsonPath.parse(message).read("$.loggedIn", String.class);
+            filename.append(loggedIn).append(".json");
+            deviceDescription.append(filename);
+            if (status.toString().equals("ok")) {
+                part = message.split("\"snapshot\":");
+                snapshot = new StringBuilder(part[1].replaceAll(",\"status\":\"ok\"}", ""));
+            } else {
+                snapshot = new StringBuilder("{\"status\":\"not ok\"}");
+            }
+            writeMsgToFile(path + url, deviceDescription.toString(), snapshot.toString());
+        } catch (java.lang.IncompatibleClassChangeError e) {
+            e.printStackTrace();
+            System.out.println(message);
         }
-        writeMsgToFile(path + url, deviceDescription.toString(), snapshot.toString());
     }
 
     @OnClose
